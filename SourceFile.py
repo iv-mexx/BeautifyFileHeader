@@ -54,6 +54,9 @@ class SourceFile(object):
     AUTHOR = re.compile(
         '@author (?P<author>.+)'
     )
+    COMPANY = re.compile(
+        '.*Copyright(?P<c> \(c\).|.)(?P<year>....) (?P<company>[a-zA-Z ]+)\..*'
+    )
 
     def __init__(self, file_path, company=None, authors=[]):
         '''
@@ -67,6 +70,18 @@ class SourceFile(object):
         'Markus Chmelar'
         >>> match.group('date')
         '02.07.12'
+        >>> COMPANY = 'Copyright 2011 TestFlight. All rights reserved.'
+        >>> match = SourceFile.COMPANY.match(COMPANY)
+        >>> match.group('company')
+        'TestFlight'
+        >>> match.group('year')
+        '2011'
+        >>> COMPANY = '  Copyright (c) 2012 TU Wien. All rights reserved.'
+        >>> match = SourceFile.COMPANY.match(COMPANY)
+        >>> match.group('company')
+        'TU Wien'
+        >>> match.group('year')
+        '2012'
         '''
         super(SourceFile, self).__init__()
         self.file_path = file_path
@@ -89,7 +104,7 @@ class SourceFile(object):
             >>> f.process_comment_line('//  Created by Jonathan Janzen on 06/11/11.')
             >>> f.process_comment_line('//  Copyright 2011 TestFlight. All rights reserved.')
             >>> f.information
-            {'date': '06/11/11', 'author': set(['Jonathan Janzen']), 'filename': '.'}
+            {'date': '06/11/11', 'company': 'TestFlight', 'author': set(['Jonathan Janzen']), 'year': '2011', 'filename': '.'}
 
             >>> g = SourceFile('Test')
             >>> g.process_comment_line('//')
@@ -100,7 +115,7 @@ class SourceFile(object):
             >>> g.process_comment_line('//  Copyright (c) 2012 TU Wien. All rights reserved.')
             >>> g.process_comment_line('//')
             >>> g.information
-            {'date': '02.07.12', 'author': set(['Markus Chmelar']), 'filename': 'Test'}
+            {'date': '02.07.12', 'company': 'TU Wien', 'author': set(['Markus Chmelar']), 'year': '2012', 'filename': 'Test'}
 
             >>> h = SourceFile('H')
             >>> h.process_comment_line('//')
@@ -114,7 +129,7 @@ class SourceFile(object):
             >>> h.process_comment_line('#ifndef Polynom_IVCGAdditions_h')
             >>> h.process_comment_line('#define Polynom_IVCGAdditions_h')
             >>> h.information
-            {'date': '22.02.13', 'author': set(['Sepp Chmelar']), 'filename': 'H'}
+            {'date': '22.02.13', 'company': 'TU Wien', 'author': set(['Sepp Chmelar']), 'year': '2013', 'filename': 'H'}
         '''
         author_date_match = SourceFile.AUTHOR_DATE.match(line)
         if author_date_match is not None:
@@ -123,6 +138,10 @@ class SourceFile(object):
         author_match = SourceFile.AUTHOR.match(line)
         if author_match is not None:
             self.information['author'].add(author_match.group('author'))
+        company_match = SourceFile.COMPANY.match(line)
+        if company_match is not None:
+            self.information['year'] = company_match.group('year')
+            self.information['company'] = company_match.group('company')
 
     def create_header(self):
         '''
@@ -137,9 +156,15 @@ class SourceFile(object):
         if 'company' in self.information.keys():
             header += ' *   @copyright       {}\n'.format(self.information['company'])
         header += ' *\n'
+
+        if 'year' in self.information.keys():
+            year = self.information['year']
+        else:
+            year = datetime.date.today().year
+
         if 'company' in self.information.keys():
             header += ' *   Copyright (c) {} {}. All rights reserved.\n'.format(
-                                                    datetime.date.today().year,
+                                                    year,
                                                     self.information['company'])
         header += ' */\n'
         return header
