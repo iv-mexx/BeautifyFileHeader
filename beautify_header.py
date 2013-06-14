@@ -87,12 +87,12 @@ def find_sources(folder_path,
     return code_file_paths
 
 
-def run(file_paths):
+def run(file_paths, company=None, authors=[]):
     '''
     Runs the Beautifier on all given files
     '''
     for file_path in file_paths:
-        sf = SourceFile(file_path)
+        sf = SourceFile(file_path, company, authors)
         sf.process_file()
 
 
@@ -132,6 +132,20 @@ def main():
         default=['c', 'h', 'm'],
         help='File-Extensions that should be scanned'
     )
+    parser.add_option(
+        '--company',
+        action='store',
+        dest='company',
+        default=None,
+        help='Replace all Copyright Information with this Company'
+    )
+    parser.add_option(
+        '--authors',
+        action='append',
+        dest='authors',
+        default=[],
+        help='Replacing the Author Entryes in all Files by these Authors'
+    )
 
     (options, args) = parser.parse_args()
 
@@ -147,7 +161,7 @@ def main():
         return
 
     file_paths = find_sources('.', options.extensions, options.ignore_patterns)
-    run(file_paths)
+    run(file_paths, options.company, options.authors)
 
     return 0
 
