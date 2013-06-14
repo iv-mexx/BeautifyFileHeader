@@ -88,6 +88,8 @@ class SourceFile(object):
         self.information = {}
         self.information['filename'] = os.path.split(file_path)[1]
         self.information['author'] = set(authors)
+        self.overwrite_authors = len(authors) is not 0
+        self.overwrite_company = company is not None
         if company is not None:
             self.information['company'] = company
 
@@ -130,18 +132,48 @@ class SourceFile(object):
             >>> h.process_comment_line('#define Polynom_IVCGAdditions_h')
             >>> h.information
             {'date': '22.02.13', 'company': 'TU Wien', 'author': set(['Sepp Chmelar']), 'year': '2013', 'filename': 'H'}
+
+            >>> i = SourceFile('H', company='Test')
+            >>> i.process_comment_line('//')
+            >>> i.process_comment_line('//  IVCGAdditions.h')
+            >>> i.process_comment_line('//  Polynom')
+            >>> i.process_comment_line('//')
+            >>> i.process_comment_line('//  Created by Sepp Chmelar on 22.02.13.')
+            >>> i.process_comment_line('//  Copyright (c) 2013 TU Wien. All rights reserved.')
+            >>> i.process_comment_line('//')
+            >>> i.process_comment_line('')
+            >>> i.process_comment_line('#ifndef Polynom_IVCGAdditions_h')
+            >>> i.process_comment_line('#define Polynom_IVCGAdditions_h')
+            >>> i.information
+            {'date': '22.02.13', 'company': 'Test', 'author': set(['Sepp Chmelar']), 'year': '2013', 'filename': 'H'}
+
+            >>> j = SourceFile('H', authors=['a1', 'a2'])
+            >>> j.process_comment_line('//')
+            >>> j.process_comment_line('//  IVCGAdditions.h')
+            >>> j.process_comment_line('//  Polynom')
+            >>> j.process_comment_line('//')
+            >>> j.process_comment_line('//  Created by Sepp Chmelar on 22.02.13.')
+            >>> j.process_comment_line('//  Copyright (c) 2013 TU Wien. All rights reserved.')
+            >>> j.process_comment_line('//')
+            >>> j.process_comment_line('')
+            >>> j.process_comment_line('#ifndef Polynom_IVCGAdditions_h')
+            >>> j.process_comment_line('#define Polynom_IVCGAdditions_h')
+            >>> j.information
+            {'date': '22.02.13', 'company': 'TU Wien', 'author': set(['a1', 'a2']), 'year': '2013', 'filename': 'H'}
         '''
         author_date_match = SourceFile.AUTHOR_DATE.match(line)
         if author_date_match is not None:
-            self.information['author'].add(author_date_match.group('author'))
+            if self.overwrite_authors is False:
+                self.information['author'].add(author_date_match.group('author'))
             self.information['date'] = author_date_match.group('date')
         author_match = SourceFile.AUTHOR.match(line)
-        if author_match is not None:
+        if author_match is not None and self.overwrite_authors is False:
             self.information['author'].add(author_match.group('author'))
         company_match = SourceFile.COMPANY.match(line)
         if company_match is not None:
             self.information['year'] = company_match.group('year')
-            self.information['company'] = company_match.group('company')
+            if self.overwrite_company is False:
+                self.information['company'] = company_match.group('company')
 
     def create_header(self):
         '''
