@@ -42,8 +42,7 @@ class SourceFile(object):
         # Line start
         '^\w*'
         # Comment
-        # TODO: RE change so that /**, /* and * starts of comments are possible
-        '//(?P<comment>.*)'
+        '(//|/\*\*|\*|/\*)(?P<comment>.*)'
         # # End of line
         '\w*'
     )
@@ -64,6 +63,12 @@ class SourceFile(object):
 
         >>> SourceFile.COMMENT.match('//    Comment').group('comment')
         '    Comment'
+        >>> match = SourceFile.COMMENT.match('/** Bla Bla')
+        >>> match.group('comment')
+        ' Bla Bla'
+        >>> match = SourceFile.COMMENT.match('* Bla Bla')
+        >>> match.group('comment')
+        ' Bla Bla'
         >>> AUTHOR_COMMENT = 'Created by Markus Chmelar on 02.07.12.'
         >>> match = SourceFile.AUTHOR_DATE.match(AUTHOR_COMMENT)
         >>> match.group('author')
