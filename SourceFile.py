@@ -55,7 +55,7 @@ class SourceFile(object):
         '@author (?P<author>.+)'
     )
 
-    def __init__(self, file_path, company=None, authors=set()):
+    def __init__(self, file_path, company=None, authors=[]):
         '''
         Test Regular Expressions
 
@@ -72,8 +72,7 @@ class SourceFile(object):
         self.file_path = file_path
         self.information = {}
         self.information['filename'] = os.path.split(file_path)[1]
-        logging.debug(authors)
-        self.information['author'] = authors
+        self.information['author'] = set(authors)
         if company is not None:
             self.information['company'] = company
 
@@ -100,6 +99,8 @@ class SourceFile(object):
             >>> g.process_comment_line('//  Created by Markus Chmelar on 02.07.12.')
             >>> g.process_comment_line('//  Copyright (c) 2012 TU Wien. All rights reserved.')
             >>> g.process_comment_line('//')
+            >>> g.information
+            {'date': '02.07.12', 'author': set(['Markus Chmelar']), 'filename': 'Test'}
 
             >>> h = SourceFile('H')
             >>> h.process_comment_line('//')
@@ -112,6 +113,8 @@ class SourceFile(object):
             >>> h.process_comment_line('')
             >>> h.process_comment_line('#ifndef Polynom_IVCGAdditions_h')
             >>> h.process_comment_line('#define Polynom_IVCGAdditions_h')
+            >>> h.information
+            {'date': '22.02.13', 'author': set(['Sepp Chmelar']), 'filename': 'H'}
         '''
         author_date_match = SourceFile.AUTHOR_DATE.match(line)
         if author_date_match is not None:
@@ -144,9 +147,6 @@ class SourceFile(object):
     def process_file(self):
         '''
         Scans the file, finds the file-header and updates it
-
-        >>> f = SourceFile('TestInput/main.m')
-        >>> f.process_file()
         '''
         # Create temp file
         temp_folder_path = tempfile.mkdtemp()
