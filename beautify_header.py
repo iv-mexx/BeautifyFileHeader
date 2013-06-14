@@ -8,7 +8,7 @@
 # ------------------------------------------------------------------------------
 
 '''
-This Script takes a high-resolution image and generates a mbtiles database from the file
+This script beautifies the file-headers of source files in a given path.
 '''
 
 # System Specific parameters and functions
@@ -31,7 +31,7 @@ def find_sources(folder_path,
                  extensions=['h', 'c', 'm', 'mm'],
                  ignore_patterns=None):
     '''Finds all source-files in the path that fit the extensions and
-    ignore-patterns
+    ignore-patterns and returns their paths
 
     Keyword arguments:
 
@@ -65,7 +65,6 @@ def find_sources(folder_path,
         >>> find_sources('TestInput', ignore_patterns=['3rdParty'])
         ['TestInput/main.m', 'TestInput/Sources/IVCGAdditions.h', 'TestInput/Sources/Subfolder/LocalizationHandlerUtil.h', 'TestInput/Sources/Subfolder/LocalizationHandlerUtil.m']
     '''
-    # First run genstrings on all source-files
     code_file_paths = []
 
     for dir_path, dir_names, file_names in os.walk(folder_path):
