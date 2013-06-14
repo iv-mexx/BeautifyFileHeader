@@ -186,7 +186,7 @@ class SourceFile(object):
         if 'date' in self.information.keys():
             header += ' *   @date       {}\n'.format(self.information['date'])
         if 'company' in self.information.keys():
-            header += ' *   @copyright       {}\n'.format(self.information['company'])
+            header += ' *   @Copyright  {}\n'.format(self.information['company'])
         header += ' *\n'
 
         if 'year' in self.information.keys():
