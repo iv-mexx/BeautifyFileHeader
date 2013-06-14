@@ -189,10 +189,10 @@ class SourceFile(object):
         # Close Files
         dest_file.close()
 
-        # #Remove original file
-        # remove(file_path)
-        # #Move new file
-        # shutil.move(temp_file_path, file_path)
+        #Remove original file
+        # os.remove(self.file_path)
+        #Move new file
+        shutil.move(temp_file_path, self.file_path)
 
         # Delete Temp-Directory
         shutil.rmtree(temp_folder_path)
