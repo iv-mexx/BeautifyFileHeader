@@ -42,7 +42,7 @@ class SourceFile(object):
         # Line start
         '^\w*'
         # Comment
-        '(//|/\*\*|\*|/\*)(?P<comment>.*)'
+        '(//|/\*\*|\*|/\*|\*/)(?P<comment>.*)'
         # # End of line
         '\w*'
     )
