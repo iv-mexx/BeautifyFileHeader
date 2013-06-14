@@ -1,10 +1,10 @@
-//
-//  IVCGAdditions.h
-//  Polynom
-//
-//  Created by Markus Chmelar on 22.02.13.
-//  Copyright (c) 2013 TU Wien. All rights reserved.
-//
+/**
+ *  IVCGAdditions.h
+ *  Polynom
+ *
+ *  Created by Markus Chmelar on 22.02.13.
+ *  Copyright (c) 2013 TU Wien. All rights reserved.
+ */
 
 #ifndef Polynom_IVCGAdditions_h
 #define Polynom_IVCGAdditions_h
