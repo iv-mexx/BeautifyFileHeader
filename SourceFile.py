@@ -42,7 +42,7 @@ class SourceFile(object):
         # Line start
         '^\w*'
         # Comment
-        '(//|/\*\*|\*|/\*|\*/)(?P<comment>.*)'
+        ' *(//|.*/\*\*|\*|/\*|\*/)(?P<comment>.*)'
         # # End of line
         '\w*'
     )
@@ -66,7 +66,8 @@ class SourceFile(object):
         >>> match = SourceFile.COMMENT.match('/** Bla Bla')
         >>> match.group('comment')
         ' Bla Bla'
-        >>> match = SourceFile.COMMENT.match('* Bla Bla')
+        >>> match = SourceFile.COMMENT.match(' *')
+        >>> match = SourceFile.COMMENT.match(' * Bla Bla')
         >>> match.group('comment')
         ' Bla Bla'
         >>> AUTHOR_COMMENT = 'Created by Markus Chmelar on 02.07.12.'
@@ -209,6 +210,9 @@ class SourceFile(object):
     def process_file(self):
         '''
         Scans the file, finds the file-header and updates it
+
+        >>> s = SourceFile('TestInput/Sources/IVCGAdditions.h')
+        >>> s.process_file()
         '''
         # Create temp file
         temp_folder_path = tempfile.mkdtemp()
@@ -229,7 +233,6 @@ class SourceFile(object):
             self.process_comment_line(line)
 
         # Write a new Header
-        
         logging.debug('Information: {}'.format(self.information))
 
         header = self.create_header()
