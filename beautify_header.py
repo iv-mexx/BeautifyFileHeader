@@ -25,6 +25,8 @@ import doctest
 import json
 # Math
 import math
+# SourceFile
+from SourceFile import SourceFile
 
 
 def find_sources(folder_path,
@@ -85,6 +87,15 @@ def find_sources(folder_path,
     return code_file_paths
 
 
+def run(file_paths):
+    '''
+    Runs the Beautifier on all given files
+    '''
+    for file_path in file_paths:
+        sf = SourceFile(file_path)
+        sf.process_file()
+
+
 def main():
     ''' Parse the command line and execute the programm with the parameters '''
 
@@ -118,7 +129,7 @@ def main():
         '--extension',
         action='append',
         dest='extensions',
-        default=None,
+        default=['c', 'h', 'm'],
         help='File-Extensions that should be scanned'
     )
 
@@ -135,9 +146,11 @@ def main():
         doctest.testmod()
         return
 
+    file_paths = find_sources('.', options.extensions, options.ignore_patterns)
+    run(file_paths)
+
     return 0
 
 
 if __name__ == '__main__':
-    doctest.testmod()
     sys.exit(main())
