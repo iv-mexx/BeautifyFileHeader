@@ -21,10 +21,6 @@ import optparse
 import logging
 # Doc-Tests
 import doctest
-# JSON
-import json
-# Math
-import math
 # SourceFile
 from SourceFile import SourceFile
 
