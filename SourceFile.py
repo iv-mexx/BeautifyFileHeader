@@ -16,14 +16,10 @@ its file-header
 import sys
 # Operation Systems and Path Operations
 import os
-# Commandline Options parser
-import optparse
 # Logging
 import logging
 # Doc-Tests
 import doctest
-# JSON
-import json
 # Regular Expressions
 import re
 # Creating and using Temporal File
@@ -32,6 +28,7 @@ import tempfile
 import datetime
 # Filesystem Operations
 import shutil
+
 
 class SourceFile(object):
     """Represents a SourceFile and provides the functionality to beautify its
@@ -192,7 +189,7 @@ class SourceFile(object):
         if 'date' in self.information.keys():
             header += ' *   @date       {}\n'.format(self.information['date'])
         if 'company' in self.information.keys():
-            header += ' *   @Copyright  {}\n'.format(self.information['company'])
+            header += ' *   @copyright  {}\n'.format(self.information['company'])
         header += ' *\n'
 
         if 'year' in self.information.keys():
@@ -219,9 +216,7 @@ class SourceFile(object):
         temp_file_path = '{}/{}'.format(temp_folder_path,
                                         self.information['filename'])
 
-        logging.debug('Processing Source-File {} with Temp-File {}'.format(
-                                                                self.file_path,
-                                                                temp_file_path))
+        logging.debug('Processing Source-File {}'.format(self.file_path))
 
         dest_file = open(temp_file_path, 'w')
 
@@ -233,13 +228,8 @@ class SourceFile(object):
             self.process_comment_line(line)
 
         # Write a new Header
-        logging.debug('Information: {}'.format(self.information))
-
         header = self.create_header()
         dest_file.write(header)
-
-        logging.debug('Header Parsing complete')
-        logging.debug('Header: {}'.format(header))
 
         # Every following line only has to be copied
         comment_ended = False
@@ -254,8 +244,6 @@ class SourceFile(object):
         # Close Files
         dest_file.close()
 
-        #Remove original file
-        # os.remove(self.file_path)
         #Move new file
         shutil.move(temp_file_path, self.file_path)
 
